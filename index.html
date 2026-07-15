@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>baryshpol.sys — панель</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<!-- =====================================================================
+     baryshpol.sys — Telegram Mini App / візитка-резюме
+     Концепція: особистий "пульт керування" AI-інтегратора.
+     ЩОБ РЕДАГУВАТИ — зміни лише об'єкт CONFIG внизу (у <script>).
+     Контакти вже заповнені з твого CV — перевір і, за потреби, поправ.
+     Лінк на CV(PDF) працює лише якщо документ відкрито "всім за посиланням".
+     ===================================================================== -->
+<style>
+  :root{
+    --bg:#0b0b10; --panel:#131320; --panel2:#0f0f18;
+    --line:#22222f; --line2:#2c2c3d;
+    --ink:#0b0b10;
+    --violet:#7b5cff; --violet-d:#3d1fd6;
+    --orange:#ff6a2b; --pink:#ff7ac2;
+    --lime:#b6ff2e;
+    --txt:#ececf3; --muted:#7a7a8c; --dim:#4a4a5c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:#000;color:var(--txt);
+    font-family:'JetBrains Mono',monospace;font-size:14px;
+    overscroll-behavior:none;-webkit-font-smoothing:antialiased;
+  }
+  #app{
+    position:relative;width:100%;max-width:460px;height:100dvh;margin:0 auto;
+    background:var(--bg);overflow:hidden;
+    background-image:
+      radial-gradient(120% 80% at 100% 0%, rgba(123,92,255,.14), transparent 55%),
+      radial-gradient(120% 70% at 0% 100%, rgba(255,106,43,.10), transparent 55%);
+  }
+  /* тонкі скан-лінії — атмосфера консолі */
+  #app::after{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:60;opacity:.35;
+    background:repeating-linear-gradient(to bottom, rgba(255,255,255,.018) 0 1px, transparent 1px 3px);
+  }
+
+  .cur{display:inline-block;width:9px;height:1.05em;background:var(--lime);
+    vertical-align:-2px;margin-left:3px;animation:blink 1.05s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* ─────────── БУТ-ЕКРАН ─────────── */
+  #boot{position:absolute;inset:0;z-index:80;background:var(--bg);
+    display:flex;flex-direction:column;justify-content:center;padding:0 26px;gap:6px;
+    font-size:13px;color:var(--muted);cursor:pointer}
+  #boot .l{opacity:0}
+  #boot .l.on{opacity:1}
+  #boot .ok{color:var(--lime)}
+  #boot .hl{color:var(--txt)}
+  #boot .skip{position:absolute;bottom:22px;left:0;right:0;text-align:center;
+    font-size:10px;letter-spacing:.2em;color:var(--dim)}
+
+  /* ─────────── ЕКРАНИ ─────────── */
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;
+    opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease}
+  .screen.active{opacity:1;visibility:visible;pointer-events:auto}
+  .scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .scroll::-webkit-scrollbar{width:0}
+
+  /* верхня системна стрічка */
+  .sysbar{display:flex;align-items:center;gap:8px;padding:11px 16px;
+    border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.12em;color:var(--muted)}
+  .led{width:8px;height:8px;border-radius:50%;background:var(--lime);
+    box-shadow:0 0 8px var(--lime);animation:pulse 2.2s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.35;box-shadow:none}}
+  .sysbar .sp{margin-left:auto;color:var(--dim)}
+
+  /* кнопка НАЗАД (видима на кожному внутрішньому екрані) */
+  .nav{display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .back{display:inline-flex;align-items:center;gap:8px;
+    background:var(--panel);border:1px solid var(--line2);color:var(--txt);
+    font-family:inherit;font-size:12px;letter-spacing:.08em;font-weight:700;
+    padding:9px 14px;border-radius:8px;cursor:pointer;transition:.12s}
+  .back:hover{border-color:var(--violet);color:#fff}
+  .back:active{transform:translateX(-2px)}
+  .nav .tag{font-size:11px;letter-spacing:.18em;color:var(--muted)}
+  .nav .tag b{color:var(--lime)}
+
+  /* ─────────── ГОЛОВНА (home) ─────────── */
+  .hero{padding:26px 20px 12px}
+  .kicker{font-size:11px;letter-spacing:.22em;color:var(--muted);margin-bottom:14px}
+  .kicker b{color:var(--orange)}
+  .name1{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(30px,9vw,42px);
+    line-height:.98;letter-spacing:-.01em;color:var(--txt)}
+  .name2{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(38px,12vw,58px);
+    line-height:.9;letter-spacing:-.02em;
+    background:linear-gradient(96deg,var(--violet),var(--pink) 45%,var(--orange));
+    -webkit-background-clip:text;background-clip:text;color:transparent;margin-top:2px}
+  .role{margin-top:14px;font-size:13px;color:var(--txt);letter-spacing:.02em}
+  .role .d{color:var(--dim);margin:0 6px}
+  .loc{margin-top:9px;font-size:12px;color:var(--muted);line-height:1.6}
+  .loc .g{color:var(--lime)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .chip{font-size:11px;letter-spacing:.04em;padding:6px 10px;border-radius:20px;
+    border:1px solid var(--line2);color:#c7c7d4;background:rgba(255,255,255,.02)}
+  .chip.hot{border-color:var(--lime);color:var(--lime);background:rgba(182,255,46,.06)}
+
+  .prompt{padding:20px 20px 8px;font-size:11px;letter-spacing:.14em;color:var(--muted)}
+  .prompt .p{color:var(--violet)}
+
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:6px 16px 8px}
+  .mod{position:relative;border:1px solid var(--line2);border-radius:12px;
+    background:linear-gradient(180deg,var(--panel),var(--panel2));
+    padding:16px 14px;min-height:96px;cursor:pointer;overflow:hidden;
+    display:flex;flex-direction:column;justify-content:space-between;transition:.14s}
+  .mod:hover{border-color:var(--violet)}
+  .mod:active{transform:scale(.975)}
+  .mod .no{font-size:10px;letter-spacing:.16em;color:var(--dim)}
+  .mod .nm{font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;line-height:1;margin-top:auto}
+  .mod .ar{position:absolute;top:14px;right:14px;color:var(--muted);font-size:14px}
+  .mod.hire{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;
+    justify-content:space-between;border-color:transparent;
+    background:linear-gradient(96deg,var(--violet-d),var(--violet) 60%,var(--orange))}
+  .mod.hire .nm{margin:0;color:#fff}
+  .mod.hire .sub{font-size:11px;letter-spacing:.1em;color:rgba(255,255,255,.85)}
+  .mod.hire .ar{color:#fff}
+
+  .sched{margin:12px 16px 22px;border:1px dashed var(--line2);border-radius:10px;
+    padding:11px 14px;overflow:hidden;white-space:nowrap}
+  .sched .tick{display:inline-block;font-size:11px;letter-spacing:.08em;color:var(--muted);
+    animation:slide 22s linear infinite}
+  .sched b{color:var(--lime)}.sched i{color:var(--orange);font-style:normal}
+  @keyframes slide{from{transform:translateX(20px)}to{transform:translateX(-100%)}}
+
+  /* ─────────── заголовки внутрішніх ─────────── */
+  .head{padding:22px 20px 8px}
+  .head h2{font-family:'Unbounded',sans-serif;font-weight:900;font-size:34px;line-height:.92;letter-spacing:-.01em}
+  .head .sub{margin-top:8px;font-size:12px;color:var(--muted);letter-spacing:.02em}
+  .head.violet h2{color:var(--violet)}.head.orange h2{color:var(--orange)}
+  .head.pink h2{color:var(--pink)}.head.lime h2{color:var(--lime)}
+  .body{padding:8px 20px 30px}
+
+  /* СТЕК */
+  .grp{margin-top:20px}
+  .grp:first-child{margin-top:6px}
+  .grp .gt{font-size:11px;letter-spacing:.16em;color:var(--muted);margin-bottom:10px;
+    display:flex;align-items:center;gap:10px}
+  .grp .gt::after{content:"";flex:1;height:1px;background:var(--line)}
+  .tags{display:flex;flex-wrap:wrap;gap:7px}
+  .tg{font-size:12.5px;padding:7px 11px;border:1px solid var(--line2);border-radius:7px;
+    background:var(--panel2);color:#dcdce6}
+  .tg.k{border-color:var(--violet);color:#cfc4ff}
+
+  /* ПРОЄКТИ (сервіси) */
+  .svc{border:1px solid var(--line2);border-radius:12px;background:var(--panel2);
+    margin-bottom:12px;overflow:hidden}
+  .svc .top{display:flex;align-items:flex-start;gap:12px;padding:16px;cursor:pointer}
+  .svc .dot{width:9px;height:9px;border-radius:50%;margin-top:6px;flex:none}
+  .dot.live{background:var(--lime);box-shadow:0 0 8px var(--lime)}
+  .dot.sub{background:var(--violet);box-shadow:0 0 8px var(--violet)}
+  .dot.dev{background:var(--orange);box-shadow:0 0 8px var(--orange)}
+  .svc .mid{flex:1;min-width:0}
+  .svc .sn{font-family:'Unbounded',sans-serif;font-weight:700;font-size:19px;line-height:1}
+  .svc .sd{margin-top:7px;font-size:12.5px;color:#c2c2d0;line-height:1.5}
+  .svc .stt{font-size:9.5px;letter-spacing:.12em;padding:5px 8px;border-radius:20px;flex:none;font-weight:700}
+  .stt.live{background:rgba(182,255,46,.12);color:var(--lime)}
+  .stt.sub{background:rgba(123,92,255,.15);color:#c4b6ff}
+  .stt.dev{background:rgba(255,106,43,.13);color:var(--orange)}
+  .svc .exp{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .svc.open .exp{max-height:340px}
+  .svc .expi{padding:0 16px 16px;border-top:1px solid var(--line);margin-top:2px;padding-top:14px}
+  .svc ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .svc li{font-size:12.5px;color:#c8c8d4;line-height:1.45;padding-left:16px;position:relative}
+  .svc li::before{content:"›";position:absolute;left:0;color:var(--violet);font-weight:700}
+  .svc .tech{margin-top:12px;font-size:11px;letter-spacing:.04em;color:var(--lime)}
+  .svc .chev{color:var(--muted);font-size:12px;transition:transform .25s;margin-top:4px}
+  .svc.open .chev{transform:rotate(90deg)}
+
+  /* ДОСВІД */
+  .xp{position:relative;padding:0 0 22px 20px;border-left:1px solid var(--line2)}
+  .xp:last-child{border-color:transparent;padding-bottom:4px}
+  .xp::before{content:"";position:absolute;left:-5px;top:2px;width:10px;height:10px;
+    border-radius:50%;background:var(--bg);border:2px solid var(--violet)}
+  .xp .yr{font-size:11px;letter-spacing:.1em;color:var(--orange)}
+  .xp .ti{font-family:'Unbounded',sans-serif;font-weight:700;font-size:16px;margin:5px 0 2px}
+  .xp .co{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .xp ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .xp li{font-size:12.5px;color:#c2c2d0;line-height:1.45;padding-left:15px;position:relative}
+  .xp li::before{content:"–";position:absolute;left:0;color:var(--dim)}
+
+  /* КОНТАКТ */
+  .row{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--txt);
+    padding:17px 6px;border-bottom:1px solid var(--line);transition:.12s}
+  .row:hover{padding-left:12px}
+  .row .rk{flex:0 0 84px;font-size:11px;letter-spacing:.1em;color:var(--muted)}
+  .row .rv{flex:1;font-size:14px;color:var(--txt);word-break:break-all}
+  .row .ra{color:var(--muted)}
+  .row.cta{border:1px solid var(--lime);border-radius:10px;margin:16px 0 6px;padding:16px;
+    background:rgba(182,255,46,.06)}
+  .row.cta .rk,.row.cta .rv{color:var(--lime)}.row.cta .ra{color:var(--lime)}
+  .foot{padding:24px 4px 34px;color:var(--dim);font-size:10.5px;letter-spacing:.08em;line-height:2}
+  .foot .g{color:var(--lime)}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+    #boot .l{opacity:1}.sched .tick{animation:none}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- БУТ -->
+  <div id="boot">
+    <div class="l" id="b0">&gt; init <span class="hl">baryshpol.sys</span></div>
+    <div class="l" id="b1">&gt; стек: python · aiogram · supabase <span class="ok">ok</span></div>
+    <div class="l" id="b2">&gt; сервіси: <span class="hl">4 online</span></div>
+    <div class="l" id="b3">&gt; статус: <span class="ok">OPEN_TO_WORK</span></div>
+    <div class="l" id="b4">&gt; готово<span class="cur"></span></div>
+    <div class="skip">ТОРКНІТЬСЯ, ЩОБ ПРОПУСТИТИ</div>
+  </div>
+
+  <!-- ГОЛОВНА -->
+  <section class="screen" id="s-home">
+    <div class="sysbar"><span class="led"></span><span>baryshpol.sys</span>
+      <span class="sp" id="clk">--:--</span></div>
+    <div class="scroll">
+      <div class="hero">
+        <div class="kicker">// ПАНЕЛЬ КЕРУВАННЯ · <b>AI-ІНТЕГРАТОР</b></div>
+        <div class="name1" id="h-n1">ДМИТРО</div>
+        <div class="name2" id="h-n2">БАРИШПОЛЬ</div>
+        <div class="role" id="h-role"></div>
+        <div class="loc" id="h-loc"></div>
+        <div class="chips" id="h-chips"></div>
+      </div>
+
+      <div class="prompt"><span class="p">dmytro@sys</span>:~$ оберіть модуль</div>
+      <div class="menu">
+        <div class="mod" data-go="profile"><span class="ar">↗</span><div class="no">01</div><div class="nm">ПРОФІЛЬ</div></div>
+        <div class="mod" data-go="stack"><span class="ar">↗</span><div class="no">02</div><div class="nm">СТЕК</div></div>
+        <div class="mod" data-go="projects"><span class="ar">↗</span><div class="no">03</div><div class="nm">ПРОЄКТИ</div></div>
+        <div class="mod" data-go="experience"><span class="ar">↗</span><div class="no">04</div><div class="nm">ДОСВІД</div></div>
+        <div class="mod hire" data-go="contact"><div><div class="nm">05 · КОНТАКТ</div><div class="sub">НАПИСАТИ / НАЙНЯТИ</div></div><span class="ar">↗</span></div>
+      </div>
+
+      <div class="sched"><span class="tick" id="tick"></span></div>
+    </div>
+  </section>
+
+  <!-- ПРОФІЛЬ -->
+  <section class="screen" id="s-profile">
+    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>01</b> / ПРОФІЛЬ</span></div>
+    <div class="scroll">
+      <div class="head violet"><h2>ПРОФІЛЬ</h2><div class="sub">хто я і що роблю</div></div>
+      <div class="body" id="profile-body"></div>
+    </div>
+  </section>
+
+  <!-- СТЕК -->
+  <section class="screen" id="s-stack">
+    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>02</b> / СТЕК</span></div>
+    <div class="scroll">
+      <div class="head lime"><h2>СТЕК</h2><div class="sub" id="stack-sub"></div></div>
+      <div class="body" id="stack-body"></div>
+    </div>
+  </section>
+
+  <!-- ПРОЄКТИ -->
+  <section class="screen" id="s-projects">
+    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>03</b> / ПРОЄКТИ</span></div>
+    <div class="scroll">
+      <div class="head orange"><h2>ПРОЄКТИ</h2><div class="sub">торкніться сервісу, щоб розгорнути деталі</div></div>
+      <div class="body" id="projects-body"></div>
+    </div>
+  </section>
+
+  <!-- ДОСВІД -->
+  <section class="screen" id="s-experience">
+    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>04</b> / ДОСВІД</span></div>
+    <div class="scroll">
+      <div class="head pink"><h2>ДОСВІД</h2><div class="sub">освіта · шлях</div></div>
+      <div class="body" id="experience-body"></div>
+    </div>
+  </section>
+
+  <!-- КОНТАКТ -->
+  <section class="screen" id="s-contact">
+    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>05</b> / КОНТАКТ</span></div>
+    <div class="scroll">
+      <div class="head violet"><h2>КОНТАКТ</h2><div class="sub">з'єднання зашифроване · відкритий до роботи</div></div>
+      <div class="body" id="contact-body"></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =====================================================================
+   ⚙️  CONFIG — реальні дані з твого CV. Правити тут.
+   ===================================================================== */
+const CONFIG = {
+  name1:"ДМИТРО", name2:"БАРИШПОЛЬ",
+  role:"AI Integrator · Python Developer · Automation",
+  location:"Одеса, Україна · <span class='g'>відкритий до офіційного працевлаштування</span> · можливе бронювання · англійська B1",
+  chips:[
+    {t:"OPEN TO WORK", hot:true},
+    {t:"python"},{t:"aiogram 3.x"},{t:"supabase"},{t:"LLM API"},{t:"mini apps"}
+  ],
+
+  profile:[
+    "Проєктую й підтримую чат-боти для Telegram (aiogram 3.x) та інтегрую LLM API (Claude, GPT) у робочі процеси.",
+    "Маю досвід повного циклу: від бекенду на Supabase (PostgreSQL, Edge Functions) до деплою в продакшн і документування.",
+    "Вивів productized-бота на щомісячну підписку. Впевнено працюю з SQL, даними та Git.",
+    "Швидко освоюю нові інструменти (no-code / low-code, CRM). Шукаю Junior-позицію: Python / AI-автоматизація."
+  ],
+
+  stack:[
+    {group:"AI / LLM", key:true, items:["Інтеграція LLM API (Claude, GPT)","Prompt engineering","AI-агенти (основи)","Claude Code"]},
+    {group:"Боти та Telegram", items:["Telegram Bot API","aiogram 3.x","Telegram Mini Apps","Стани · рольовий доступ"]},
+    {group:"Бекенд і БД", items:["Supabase","PostgreSQL","Edge Functions","Auth · Storage","aiosqlite","REST API"]},
+    {group:"Автоматизація", items:["Serverless","APScheduler","webhooks","n8n · Make · Zapier"]},
+    {group:"Дані та аналітика", items:["SQL (PostgreSQL)","Дашборди","Наскрізна аналітика"]},
+    {group:"Мови", items:["Python","SQL","JavaScript (базово)"]},
+    {group:"Інструменти", items:["Git / GitHub","Railway","Docker (основи)"]}
+  ],
+
+  // status: live | sub | dev ; stLabel — текст пігулки
+  projects:[
+    { name:"DETAIL MIND", status:"live", stLabel:"LIVE · v1.2",
+      desc:"Telegram Mini App для студій детейлінгу (раніше Wrap 1654 Manager): замовлення, клієнти, календар, склад. Попередня версія — у продакшні; ребренд у розробці.",
+      bullets:[
+        "Працює в продакшні (v1.2): управління замовленнями, клієнтами, календарем і складом.",
+        "Edge Function smart-handler: валідація Telegram initData, авторизація, вставки у Supabase Storage.",
+        "Прибрав експозицію service role з фронтенду — чутлива логіка на захищеному бекенді.",
+        "Dashboard PRO — аналітика для власника студії.",
+        "У розробці — ребренд DetailMind: новий дизайн, вбудований support chat, лояльність (бейджі/бали для студій і майстрів)."
+      ],
+      tech:"Supabase (PostgreSQL · Edge Functions · Auth · Storage) · Telegram Mini Apps · JS" },
+
+    { name:"CAFE BOT", status:"sub", stLabel:"ПІДПИСКА · В ПРОДАКШНІ",
+      desc:"Productized-бот для мережі кав'ярень за моделлю щомісячної підписки.",
+      bullets:[
+        "Картки замовлень і статусні переходи з рольовим доступом (staff-only за Telegram ID).",
+        "Програма лояльності (кожна 8-ма кава безкоштовно) з детекцією ключових слів.",
+        "Автоматизація робочих годин і щотижнева статистика власнику (APScheduler, коректні таймзони)."
+      ],
+      tech:"Python 3.11 · aiogram 3.x · aiosqlite · APScheduler · Railway" },
+
+    { name:"RRP GUARD", status:"dev", stLabel:"2026 · В РОЗРОБЦІ",
+      desc:"Бот моніторингу дотримання РРЦ для дистриб'ютора.",
+      bullets:[
+        "Автоматичний моніторинг порушень цін: ~100 SKU, 5–10 майданчиків.",
+        "Щоденний зведений звіт о 10:00 у Telegram; збір і обробка даних у Supabase (SQL)."
+      ],
+      tech:"Python 3.11 · aiogram 3.x · Supabase · звіти за розкладом" },
+
+    { name:"SALES TRACKER", status:"live", stLabel:"ВНУТРІШНІЙ · LIVE",
+      desc:"Персональний бот-трекер воронки продажів на serverless-архітектурі.",
+      bullets:[
+        "Метрики воронки в реальному часі, зберігання й обробка в Supabase.",
+        "Serverless-логіка на Edge Functions без окремого сервера."
+      ],
+      tech:"Supabase Edge Functions · PostgreSQL" }
+  ],
+
+  experience:[
+    { yr:"2022 — 2026", ti:"Співзасновник", co:"студія Wrap 1654 (тепер Detail Mind), Одеса",
+      bullets:[
+        "Організація та автоматизація внутрішніх бізнес-процесів; розробка власних цифрових інструментів.",
+        "Ведення клієнтів від першого звернення до завершення проєкту; впровадження CRM-підходу."
+      ]},
+    { yr:"2018 — 2022", ti:"Майстер з поклейки автоплівок", co:"Одеса",
+      bullets:[
+        "Технічне виконання робіт, контроль якості, планування виробничих процесів.",
+        "Робота з клієнтами в умовах жорстких дедлайнів."
+      ]},
+    { yr:"2014 — 2019", ti:"Бакалавр з телекомунікацій", co:"ХНУРЕ, Харків",
+      bullets:["Академічний сертифікат з кібербезпеки (спеціальність 125)."]}
+  ],
+
+  // Контакти — з CV. CV(PDF) відкриється, лише якщо Google-документ у доступі "всім за посиланням".
+  contact:[
+    {rk:"TELEGRAM", rv:"@reven_vest", href:"https://t.me/reven_vest", cta:true},
+    {rk:"EMAIL", rv:"dmitrybaryshpol@gmail.com", href:"mailto:dmitrybaryshpol@gmail.com"},
+    {rk:"ТЕЛЕФОН", rv:"+380 50 643 4808", href:"tel:+380506434808"},
+    {rk:"GITHUB", rv:"github.com/dmitrybaryshpol-hub", href:"https://github.com/dmitrybaryshpol-hub"},
+    {rk:"LINKEDIN", rv:"dmitry-barry", href:"https://www.linkedin.com/in/dmitry-barry-478544135/"},
+    {rk:"CV / PDF", rv:"Завантажити резюме", href:"https://docs.google.com/document/d/10WUGf3HOWsP3Z5m5maMKQLwOS_jhm774m2QfpdK9kvQ/export?format=pdf"}
+  ],
+
+  scheduler:"SCHED · rrp_guard → звіт 10:00 <b>✓</b> · cafe_bot → лояльність <b>online</b> · detail_mind → build <i>у розробці</i> · sales_tracker → uptime <b>ok</b> · "
+};
+
+/* =====================================================================
+   Логіка
+   ===================================================================== */
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if(tg){ tg.ready(); tg.expand();
+  try{ tg.setHeaderColor('#0b0b10'); tg.setBackgroundColor('#0b0b10'); }catch(e){} }
+
+const $ = s=>document.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+let stack=['home'];
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sc=$('#s-'+id); sc.classList.add('active');
+  const sr=sc.querySelector('.scroll'); if(sr)sr.scrollTop=0;
+  if(tg){ id==='home' ? tg.BackButton.hide() : tg.BackButton.show(); }
+}
+function go(id){ if(id===stack[stack.length-1])return; stack.push(id); show(id);
+  if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred('light'); }
+function back(){ if(stack.length>1){ stack.pop(); show(stack[stack.length-1]);
+  if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred('soft'); } }
+if(tg) tg.BackButton.onClick(back);
+
+document.addEventListener('click',e=>{
+  if(e.target.closest('.back')){ back(); return; }
+  const t=e.target.closest('[data-go]'); if(t){ go(t.dataset.go); return; }
+  const s=e.target.closest('.svc .top'); if(s){ s.parentElement.classList.toggle('open'); }
+});
+
+/* РЕНДЕР */
+function render(){
+  $('#h-n1').textContent=CONFIG.name1;
+  $('#h-n2').textContent=CONFIG.name2;
+  $('#h-role').innerHTML=CONFIG.role.replace(/·/g,'<span class="d">·</span>');
+  $('#h-loc').innerHTML=CONFIG.location;
+  CONFIG.chips.forEach(c=>$('#h-chips').appendChild(el('span','chip'+(c.hot?' hot':''),c.t)));
+  $('#tick').innerHTML=CONFIG.scheduler.repeat(2);
+
+  // profile
+  const pb=$('#profile-body');
+  CONFIG.profile.forEach(p=>{const d=el('p',null,p);d.style.cssText='font-size:13.5px;color:#cdcdd8;line-height:1.65;margin-bottom:14px';pb.appendChild(d);});
+
+  // stack
+  let n=0;
+  CONFIG.stack.forEach(g=>{
+    const grp=el('div','grp'); grp.appendChild(el('div','gt',g.group));
+    const tags=el('div','tags');
+    g.items.forEach(i=>{tags.appendChild(el('span','tg'+(g.key?' k':''),i));n++;});
+    grp.appendChild(tags); $('#stack-body').appendChild(grp);
+  });
+  $('#stack-sub').textContent=n+' технологій · оновлено 2026';
+
+  // projects
+  CONFIG.projects.forEach(p=>{
+    const li=p.bullets.map(b=>`<li>${b}</li>`).join('');
+    const card=el('div','svc',
+      `<div class="top">
+         <span class="dot ${p.status}"></span>
+         <div class="mid"><div class="sn">${p.name}</div><div class="sd">${p.desc}</div></div>
+         <span class="stt ${p.status}">${p.stLabel}</span>
+         <span class="chev">▸</span>
+       </div>
+       <div class="exp"><div class="expi"><ul>${li}</ul><div class="tech">↳ ${p.tech}</div></div></div>`);
+    $('#projects-body').appendChild(card);
+  });
+
+  // experience
+  CONFIG.experience.forEach(x=>{
+    const li=x.bullets.map(b=>`<li>${b}</li>`).join('');
+    $('#experience-body').appendChild(el('div','xp',
+      `<div class="yr">${x.yr}</div><div class="ti">${x.ti}</div><div class="co">${x.co}</div><ul>${li}</ul>`));
+  });
+
+  // contact
+  CONFIG.contact.forEach(c=>{
+    const row=el('a','row'+(c.cta?' cta':''),
+      `<div class="rk">${c.rk}</div><div class="rv">${c.rv}</div><div class="ra">↗</div>`);
+    row.href=c.href;
+    if(!/^(mailto|tel):/.test(c.href)){row.target='_blank';row.rel='noopener';}
+    $('#contact-body').appendChild(row);
+  });
+  $('#contact-body').appendChild(el('div','foot',
+    'ROOT/SYS/CONTACT_INDEX<br>CONNECTION: <span class="g">ENCRYPTED</span><br>STATUS: <span class="g">OPEN_TO_WORK</span> · LAST_SYNC 0.042s'));
+}
+render();
+
+/* годинник */
+function clock(){const d=new Date();$('#clk').textContent=
+  String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+clock(); setInterval(clock,10000);
+
+/* бут-послідовність */
+const boot=$('#boot');
+function endBoot(){ if(!boot)return; boot.style.transition='opacity .3s'; boot.style.opacity='0';
+  setTimeout(()=>{boot.style.display='none';},300); show('home'); }
+if(reduce){ ['b0','b1','b2','b3','b4'].forEach(i=>$('#'+i).classList.add('on')); show('home');
+  setTimeout(endBoot,600); }
+else{
+  const ids=['b0','b1','b2','b3','b4'];
+  ids.forEach((id,i)=>setTimeout(()=>$('#'+id).classList.add('on'), 220*i+120));
+  setTimeout(endBoot, 220*ids.length+700);
+}
+boot.addEventListener('click',endBoot);
+</script>
+</body>
+</html>
