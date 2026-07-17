@@ -25,20 +25,22 @@
     --orange:#ff6a2b; --pink:#ff7ac2;
     --lime:#b6ff2e;
     --txt:#ececf3; --muted:#7a7a8c; --dim:#4a4a5c;
-    /* безпечні зони (notch / кнопки Telegram); JS уточнює для Telegram */
-    --sa-top: env(safe-area-inset-top, 0px);
-    --sa-bottom: env(safe-area-inset-bottom, 0px);
   }
+  :root{ --app-vh:100vh; --tg-top:0px; }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;width:100%;max-width:100%;overflow-x:hidden}
+  html,body{height:100%;overflow:hidden}
   body{
     background:#000;color:var(--txt);
     font-family:'JetBrains Mono',monospace;font-size:14px;
     overscroll-behavior:none;-webkit-font-smoothing:antialiased;
-    overscroll-behavior-x:none;touch-action:pan-y;
+    position:fixed;inset:0;width:100%;
   }
+  /* Висота рахується JS-ом у px (надійно у Telegram in-app браузері,
+     де dvh часто не підтримується) — 100vh/100dvh лишаються запасним варіантом. */
   #app{
-    position:relative;width:100%;max-width:460px;height:100dvh;margin:0 auto;
+    position:fixed;inset:0;margin:0 auto;
+    width:100%;max-width:460px;
+    height:100vh;height:100dvh;height:var(--app-vh);
     background:var(--bg);overflow:hidden;
     background-image:
       radial-gradient(120% 80% at 100% 0%, rgba(123,92,255,.14), transparent 55%),
@@ -50,6 +52,53 @@
     background:repeating-linear-gradient(to bottom, rgba(255,255,255,.018) 0 1px, transparent 1px 3px);
   }
 
+  /* ═══════════ DESKTOP-РЕЖИМ ═══════════
+     На великих екранах застосунок паковано як "фрейм телефону" по центру,
+     а зліва — постійна панель швидкої навігації (не потрібно тиснути "назад"). */
+  .desk-side{display:none}
+  @media (min-width:860px){
+    html,body{overflow:auto}
+    body{
+      position:static;inset:auto;width:auto;
+      display:flex;align-items:center;justify-content:center;gap:36px;
+      min-height:100vh;padding:40px;
+      background:
+        radial-gradient(1100px 650px at 12% 8%, rgba(123,92,255,.16), transparent 60%),
+        radial-gradient(950px 650px at 88% 92%, rgba(255,106,43,.12), transparent 60%),
+        #050507;
+    }
+    #app{
+      position:relative;inset:auto;margin:0;flex:none;
+      width:420px;max-width:420px;height:min(860px,88vh);
+      border-radius:26px;
+      box-shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px var(--line2);
+    }
+    .desk-side{
+      display:flex;flex-direction:column;gap:20px;
+      width:250px;flex:none;align-self:center;max-height:min(860px,88vh);
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid var(--line2);border-radius:22px;padding:26px 22px;
+      overflow-y:auto;
+    }
+    .desk-name{font-family:'Unbounded',sans-serif;font-weight:900;font-size:21px;line-height:1.08;
+      background:linear-gradient(96deg,var(--violet),var(--pink) 45%,var(--orange));
+      -webkit-background-clip:text;background-clip:text;color:transparent}
+    .desk-role{margin-top:9px;font-size:11px;color:var(--muted);letter-spacing:.05em;line-height:1.5}
+    .desk-nav{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+    .desk-item{display:flex;align-items:center;gap:10px;background:transparent;border:1px solid transparent;
+      color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.04em;
+      padding:10px 11px;border-radius:9px;cursor:pointer;text-align:left;width:100%}
+    .desk-item span{color:var(--dim);font-size:10px;letter-spacing:.1em;min-width:16px}
+    .desk-item:hover{background:rgba(255,255,255,.045)}
+    .desk-item.active{background:rgba(123,92,255,.16);border-color:var(--violet);color:#fff}
+    .desk-item.active span{color:var(--lime)}
+    .desk-cv{margin-top:auto;display:block;text-align:center;font-size:11px;letter-spacing:.06em;
+      padding:11px;border-radius:9px;border:1px solid var(--lime);color:var(--lime);text-decoration:none}
+    .desk-cv:hover{background:rgba(182,255,46,.08)}
+    .desk-status{font-size:9.5px;letter-spacing:.09em;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .desk-status i{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 6px var(--lime);flex:none}
+  }
+
   .cur{display:inline-block;width:9px;height:1.05em;background:var(--lime);
     vertical-align:-2px;margin-left:3px;animation:blink 1.05s steps(1) infinite}
   @keyframes blink{50%{opacity:0}}
@@ -57,26 +106,25 @@
   /* ─────────── БУТ-ЕКРАН ─────────── */
   #boot{position:absolute;inset:0;z-index:80;background:var(--bg);
     display:flex;flex-direction:column;justify-content:center;
-    padding:var(--sa-top) 26px var(--sa-bottom);gap:6px;
+    padding:calc(26px + var(--tg-top)) 26px 26px;gap:6px;
     font-size:13px;color:var(--muted);cursor:pointer}
   #boot .l{opacity:0}
   #boot .l.on{opacity:1}
   #boot .ok{color:var(--lime)}
   #boot .hl{color:var(--txt)}
-  #boot .skip{position:absolute;bottom:calc(22px + var(--sa-bottom));left:0;right:0;text-align:center;
+  #boot .skip{position:absolute;bottom:22px;left:0;right:0;text-align:center;
     font-size:10px;letter-spacing:.2em;color:var(--dim)}
 
   /* ─────────── ЕКРАНИ ─────────── */
   .screen{position:absolute;inset:0;display:flex;flex-direction:column;
     opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease}
   .screen.active{opacity:1;visibility:visible;pointer-events:auto}
-  .scroll{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;touch-action:pan-y}
+  .scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
   .scroll::-webkit-scrollbar{width:0}
 
-  /* верхня системна стрічка */
+  /* верхня системна стрічка (+ запас під нативну шапку Telegram: заголовок / кнопки) */
   .sysbar{display:flex;align-items:center;gap:8px;
-    padding:calc(11px + var(--sa-top)) 16px 11px;
+    padding:calc(11px + var(--tg-top)) 16px 11px;
     border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.12em;color:var(--muted)}
   .led{width:8px;height:8px;border-radius:50%;background:var(--lime);
     box-shadow:0 0 8px var(--lime);animation:pulse 2.2s ease-in-out infinite}
@@ -85,7 +133,7 @@
 
   /* кнопка НАЗАД (видима на кожному внутрішньому екрані) */
   .nav{display:flex;align-items:center;justify-content:space-between;
-    padding:calc(12px + var(--sa-top)) 14px 12px;
+    padding:calc(12px + var(--tg-top)) 14px 12px;
     border-bottom:1px solid var(--line);background:var(--panel2)}
   .back{display:inline-flex;align-items:center;gap:8px;
     background:var(--panel);border:1px solid var(--line2);color:var(--txt);
@@ -98,13 +146,12 @@
 
   /* ─────────── ГОЛОВНА (home) ─────────── */
   .hero{padding:26px 20px 12px}
-  .kicker{font-size:11px;letter-spacing:.22em;color:var(--muted);margin-bottom:14px;
-    overflow-wrap:anywhere}
+  .kicker{font-size:11px;letter-spacing:.22em;color:var(--muted);margin-bottom:14px}
   .kicker b{color:var(--orange)}
-  .name1{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(22px,7.4vw,38px);
-    line-height:.98;letter-spacing:-.02em;color:var(--txt);max-width:100%;overflow-wrap:anywhere}
-  .name2{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(22px,8.2vw,42px);
-    line-height:.9;letter-spacing:-.03em;max-width:100%;overflow-wrap:anywhere;
+  .name1{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(30px,9vw,42px);
+    line-height:.98;letter-spacing:-.01em;color:var(--txt)}
+  .name2{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(38px,12vw,58px);
+    line-height:.9;letter-spacing:-.02em;
     background:linear-gradient(96deg,var(--violet),var(--pink) 45%,var(--orange));
     -webkit-background-clip:text;background-clip:text;color:transparent;margin-top:2px}
   .role{margin-top:14px;font-size:13px;color:var(--txt);letter-spacing:.02em}
@@ -177,16 +224,9 @@
   .stt.live{background:rgba(182,255,46,.12);color:var(--lime)}
   .stt.sub{background:rgba(123,92,255,.15);color:#c4b6ff}
   .stt.dev{background:rgba(255,106,43,.13);color:var(--orange)}
-  .svc .exp{max-height:0;overflow:hidden;transition:max-height .35s ease}
-  .svc.open .exp{max-height:900px}
+  .svc .exp{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .svc.open .exp{max-height:340px}
   .svc .expi{padding:0 16px 16px;border-top:1px solid var(--line);margin-top:2px;padding-top:14px}
-  /* галерея скріншотів кейсу */
-  .svc .shots{display:flex;gap:8px;margin-top:14px;overflow-x:auto;
-    padding-bottom:4px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
-  .svc .shots::-webkit-scrollbar{height:0}
-  .svc .shots img{height:200px;width:auto;max-width:none;border-radius:9px;
-    border:1px solid var(--line2);flex:none;scroll-snap-align:start;
-    background:var(--panel);object-fit:cover}
   .svc ul{list-style:none;display:flex;flex-direction:column;gap:8px}
   .svc li{font-size:12.5px;color:#c8c8d4;line-height:1.45;padding-left:16px;position:relative}
   .svc li::before{content:"›";position:absolute;left:0;color:var(--violet);font-weight:700}
@@ -310,6 +350,24 @@
 
 </div>
 
+<!-- Панель швидкої навігації — видима лише на широких екранах (desktop) -->
+<aside class="desk-side">
+  <div>
+    <div class="desk-name">ДМИТРО<br>БАРИШПОЛЬ</div>
+    <div class="desk-role">AI Integrator · Python Developer · Odesa, UA</div>
+  </div>
+  <nav class="desk-nav">
+    <button class="desk-item" data-go="home"><span>00</span>Головна</button>
+    <button class="desk-item" data-go="profile"><span>01</span>Профіль</button>
+    <button class="desk-item" data-go="stack"><span>02</span>Стек</button>
+    <button class="desk-item" data-go="projects"><span>03</span>Проєкти</button>
+    <button class="desk-item" data-go="experience"><span>04</span>Досвід</button>
+    <button class="desk-item" data-go="contact"><span>05</span>Контакт</button>
+  </nav>
+  <a class="desk-cv" id="desk-cv" target="_blank" rel="noopener">↓ Завантажити CV (PDF)</a>
+  <div class="desk-status"><i></i> open_to_work · online</div>
+</aside>
+
 <script>
 /* =====================================================================
    ⚙️  CONFIG — реальні дані з твого CV. Правити тут.
@@ -341,12 +399,8 @@ const CONFIG = {
   ],
 
   // status: live | sub | dev ; stLabel — текст пігулки
-  // shots: масив шляхів до скріншотів кейсу, напр. ["shots/detailmind-1.png", ...].
-  //        Поклади PNG/JPG у папку shots/ поруч з index.html і додай сюди шляхи.
-  //        Якщо порожньо — галерея просто не показується.
   projects:[
     { name:"DETAIL MIND", status:"live", stLabel:"LIVE · v1.2",
-      shots:["shots/detailmind-orders.png","shots/detailmind-order.png","shots/detailmind-dashboard.png"],
       desc:"Telegram Mini App для студій детейлінгу (раніше Wrap 1654 Manager): замовлення, клієнти, календар, склад. Попередня версія — у продакшні; ребренд у розробці.",
       bullets:[
         "Працює в продакшні (v1.2): управління замовленнями, клієнтами, календарем і складом.",
@@ -358,7 +412,6 @@ const CONFIG = {
       tech:"Supabase (PostgreSQL · Edge Functions · Auth · Storage) · Telegram Mini Apps · JS" },
 
     { name:"CAFE BOT", status:"sub", stLabel:"ПІДПИСКА · В ПРОДАКШНІ",
-      shots:[],
       desc:"Productized-бот для мережі кав'ярень за моделлю щомісячної підписки.",
       bullets:[
         "Картки замовлень і статусні переходи з рольовим доступом (staff-only за Telegram ID).",
@@ -368,7 +421,6 @@ const CONFIG = {
       tech:"Python 3.11 · aiogram 3.x · aiosqlite · APScheduler · Railway" },
 
     { name:"RRP GUARD", status:"dev", stLabel:"2026 · В РОЗРОБЦІ",
-      shots:[],
       desc:"Бот моніторингу дотримання РРЦ для дистриб'ютора.",
       bullets:[
         "Автоматичний моніторинг порушень цін: ~100 SKU, 5–10 майданчиків.",
@@ -377,7 +429,6 @@ const CONFIG = {
       tech:"Python 3.11 · aiogram 3.x · Supabase · звіти за розкладом" },
 
     { name:"SALES TRACKER", status:"live", stLabel:"ВНУТРІШНІЙ · LIVE",
-      shots:[],
       desc:"Персональний бот-трекер воронки продажів на serverless-архітектурі.",
       bullets:[
         "Метрики воронки в реальному часі, зберігання й обробка в Supabase.",
@@ -420,26 +471,30 @@ const CONFIG = {
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 if(tg){ tg.ready(); tg.expand();
   try{ tg.setHeaderColor('#0b0b10'); tg.setBackgroundColor('#0b0b10'); }catch(e){}
+  try{ tg.disableVerticalSwipes && tg.disableVerticalSwipes(); }catch(e){} }
 
-  /* безпечні зони: у Telegram (особливо fullscreen) кнопки хедера
-     перекривають контент — беремо реальні відступи з API */
-  const applyInsets=()=>{
-    const sa=tg.safeAreaInset||{}, csa=tg.contentSafeAreaInset||{};
-    const top=(sa.top||0)+(csa.top||0);
-    const bottom=(sa.bottom||0)+(csa.bottom||0);
-    const root=document.documentElement.style;
-    root.setProperty('--sa-top', top+'px');
-    root.setProperty('--sa-bottom', bottom+'px');
-  };
-  try{
-    applyInsets();
-    if(tg.onEvent){
-      tg.onEvent('safeAreaChanged', applyInsets);
-      tg.onEvent('contentSafeAreaChanged', applyInsets);
-      tg.onEvent('viewportChanged', applyInsets);
-    }
-  }catch(e){}
+/* ── Реальна висота екрана + відступ під нативну шапку Telegram ──
+   Telegram's in-app WebView не завжди підтримує dvh коректно, тому
+   рахуємо px вручну і оновлюємо на кожну зміну viewport. */
+function fitViewport(){
+  const h = (tg && tg.viewportStableHeight) || window.visualViewport?.height || window.innerHeight;
+  document.documentElement.style.setProperty('--app-vh', h + 'px');
+
+  let top = 0;
+  if (tg && tg.contentSafeAreaInset && typeof tg.contentSafeAreaInset.top === 'number') {
+    top = tg.contentSafeAreaInset.top;
+  } else if (tg && tg.safeAreaInset && typeof tg.safeAreaInset.top === 'number') {
+    top = tg.safeAreaInset.top;
+  }
+  // запас під заголовок/кнопки Telegram (Закрыть · назва · ⌄ · •••),
+  // якщо API не віддав точне значення
+  if (top < 4 && tg) top = 58;
+  document.documentElement.style.setProperty('--tg-top', top + 'px');
 }
+fitViewport();
+window.addEventListener('resize', fitViewport);
+window.visualViewport && window.visualViewport.addEventListener('resize', fitViewport);
+if (tg && tg.onEvent) { tg.onEvent('viewportChanged', fitViewport); tg.onEvent('safeAreaChanged', fitViewport); tg.onEvent('contentSafeAreaChanged', fitViewport); }
 
 const $ = s=>document.querySelector(s);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
@@ -451,6 +506,7 @@ function show(id){
   const sc=$('#s-'+id); sc.classList.add('active');
   const sr=sc.querySelector('.scroll'); if(sr)sr.scrollTop=0;
   if(tg){ id==='home' ? tg.BackButton.hide() : tg.BackButton.show(); }
+  document.querySelectorAll('.desk-item').forEach(b=>b.classList.toggle('active', b.dataset.go===id));
 }
 function go(id){ if(id===stack[stack.length-1])return; stack.push(id); show(id);
   if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred('light'); }
@@ -490,9 +546,6 @@ function render(){
   // projects
   CONFIG.projects.forEach(p=>{
     const li=p.bullets.map(b=>`<li>${b}</li>`).join('');
-    const shots=(p.shots&&p.shots.length)
-      ? `<div class="shots">${p.shots.map(s=>`<img src="${s}" alt="${p.name} — скріншот" loading="lazy">`).join('')}</div>`
-      : '';
     const card=el('div','svc',
       `<div class="top">
          <span class="dot ${p.status}"></span>
@@ -500,7 +553,7 @@ function render(){
          <span class="stt ${p.status}">${p.stLabel}</span>
          <span class="chev">▸</span>
        </div>
-       <div class="exp"><div class="expi"><ul>${li}</ul><div class="tech">↳ ${p.tech}</div>${shots}</div></div>`);
+       <div class="exp"><div class="expi"><ul>${li}</ul><div class="tech">↳ ${p.tech}</div></div></div>`);
     $('#projects-body').appendChild(card);
   });
 
@@ -521,6 +574,10 @@ function render(){
   });
   $('#contact-body').appendChild(el('div','foot',
     'ROOT/SYS/CONTACT_INDEX<br>CONNECTION: <span class="g">ENCRYPTED</span><br>STATUS: <span class="g">OPEN_TO_WORK</span> · LAST_SYNC 0.042s'));
+
+  // desktop-сайдбар: беремо той самий лінк CV, що й у мобільному контакті
+  const cvEntry = CONFIG.contact.find(c => c.rk === 'CV / PDF');
+  if (cvEntry) $('#desk-cv').href = cvEntry.href;
 }
 render();
 
