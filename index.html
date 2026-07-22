@@ -130,6 +130,11 @@
     box-shadow:0 0 8px var(--lime);animation:pulse 2.2s ease-in-out infinite}
   @keyframes pulse{50%{opacity:.35;box-shadow:none}}
   .sysbar .sp{margin-left:auto;color:var(--dim)}
+  .lang{display:inline-flex;border:1px solid var(--line2);border-radius:7px;overflow:hidden;flex:none}
+  .lang button{background:transparent;border:0;color:var(--muted);font-family:inherit;
+    font-size:10px;letter-spacing:.1em;font-weight:700;padding:5px 8px;cursor:pointer}
+  .lang button.on{background:var(--violet);color:#fff}
+  .nav .lang{margin-left:auto;margin-right:10px}
 
   /* кнопка НАЗАД (видима на кожному внутрішньому екрані) */
   .nav{display:flex;align-items:center;justify-content:space-between;
@@ -148,9 +153,12 @@
   .hero{padding:26px 20px 12px}
   .kicker{font-size:11px;letter-spacing:.22em;color:var(--muted);margin-bottom:14px}
   .kicker b{color:var(--orange)}
+  .name1,.name2{white-space:nowrap}
+  /* background-clip:text може зрізати край останньої літери — лишаємо запас */
+  .name2{padding-right:3px}
   .name1{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(30px,9vw,42px);
     line-height:.98;letter-spacing:-.01em;color:var(--txt)}
-  .name2{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(38px,12vw,58px);
+  .name2{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(30px,10.5vw,52px);
     line-height:.9;letter-spacing:-.02em;
     background:linear-gradient(96deg,var(--violet),var(--pink) 45%,var(--orange));
     -webkit-background-clip:text;background-clip:text;color:transparent;margin-top:2px}
@@ -269,20 +277,22 @@
   <!-- БУТ -->
   <div id="boot">
     <div class="l" id="b0">&gt; init <span class="hl">baryshpol.sys</span></div>
-    <div class="l" id="b1">&gt; стек: python · aiogram · supabase <span class="ok">ok</span></div>
-    <div class="l" id="b2">&gt; сервіси: <span class="hl">4 online</span></div>
-    <div class="l" id="b3">&gt; статус: <span class="ok">OPEN_TO_WORK</span></div>
-    <div class="l" id="b4">&gt; готово<span class="cur"></span></div>
-    <div class="skip">ТОРКНІТЬСЯ, ЩОБ ПРОПУСТИТИ</div>
+    <div class="l" id="b1">&gt; <span data-i18n="boot1"></span>: python · aiogram · supabase <span class="ok">ok</span></div>
+    <div class="l" id="b2">&gt; <span data-i18n="boot2"></span>: <span class="hl">4 online</span></div>
+    <div class="l" id="b3">&gt; <span data-i18n="boot3"></span>: <span class="ok">OPEN_TO_WORK</span></div>
+    <div class="l" id="b4">&gt; <span data-i18n="boot4"></span><span class="cur"></span></div>
+    <div class="skip" data-i18n="bootSkip"></div>
   </div>
 
   <!-- ГОЛОВНА -->
   <section class="screen" id="s-home">
     <div class="sysbar"><span class="led"></span><span>baryshpol.sys</span>
-      <span class="sp" id="clk">--:--</span></div>
+      <span class="sp" id="clk">--:--</span>
+      <span class="lang" style="margin-left:10px">
+        <button data-lang="ua">UA</button><button data-lang="en">EN</button></span></div>
     <div class="scroll">
       <div class="hero">
-        <div class="kicker">// ПАНЕЛЬ КЕРУВАННЯ · <b>AI-ІНТЕГРАТОР</b></div>
+        <div class="kicker">// <span data-i18n="kicker"></span> · <b data-i18n="kickerB"></b></div>
         <div class="name1" id="h-n1">ДМИТРО</div>
         <div class="name2" id="h-n2">БАРИШПОЛЬ</div>
         <div class="role" id="h-role"></div>
@@ -290,13 +300,13 @@
         <div class="chips" id="h-chips"></div>
       </div>
 
-      <div class="prompt"><span class="p">dmytro@sys</span>:~$ оберіть модуль</div>
+      <div class="prompt"><span class="p">dmytro@sys</span>:~$ <span data-i18n="choose"></span></div>
       <div class="menu">
-        <div class="mod" data-go="profile"><span class="ar">↗</span><div class="no">01</div><div class="nm">ПРОФІЛЬ</div></div>
-        <div class="mod" data-go="stack"><span class="ar">↗</span><div class="no">02</div><div class="nm">СТЕК</div></div>
-        <div class="mod" data-go="projects"><span class="ar">↗</span><div class="no">03</div><div class="nm">ПРОЄКТИ</div></div>
-        <div class="mod" data-go="experience"><span class="ar">↗</span><div class="no">04</div><div class="nm">ДОСВІД</div></div>
-        <div class="mod hire" data-go="contact"><div><div class="nm">05 · КОНТАКТ</div><div class="sub">НАПИСАТИ / НАЙНЯТИ</div></div><span class="ar">↗</span></div>
+        <div class="mod" data-go="profile"><span class="ar">↗</span><div class="no">01</div><div class="nm" data-i18n="mProfile"></div></div>
+        <div class="mod" data-go="stack"><span class="ar">↗</span><div class="no">02</div><div class="nm" data-i18n="mStack"></div></div>
+        <div class="mod" data-go="projects"><span class="ar">↗</span><div class="no">03</div><div class="nm" data-i18n="mProjects"></div></div>
+        <div class="mod" data-go="experience"><span class="ar">↗</span><div class="no">04</div><div class="nm" data-i18n="mExp"></div></div>
+        <div class="mod hire" data-go="contact"><div><div class="nm">05 · <span data-i18n="mContact"></span></div><div class="sub" data-i18n="mContactSub"></div></div><span class="ar">↗</span></div>
       </div>
 
       <div class="sched"><span class="tick" id="tick"></span></div>
@@ -305,45 +315,45 @@
 
   <!-- ПРОФІЛЬ -->
   <section class="screen" id="s-profile">
-    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>01</b> / ПРОФІЛЬ</span></div>
+    <div class="nav"><button class="back">← <span data-i18n="back"></span></button><span class="lang"><button data-lang="ua">UA</button><button data-lang="en">EN</button></span><span class="tag"><span data-i18n="module"></span> <b>01</b> / <span data-i18n="tagProfile"></span></span></div>
     <div class="scroll">
-      <div class="head violet"><h2>ПРОФІЛЬ</h2><div class="sub">хто я і що роблю</div></div>
+      <div class="head violet"><h2 data-i18n="hProfile"></h2><div class="sub" data-i18n="sProfile"></div></div>
       <div class="body" id="profile-body"></div>
     </div>
   </section>
 
   <!-- СТЕК -->
   <section class="screen" id="s-stack">
-    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>02</b> / СТЕК</span></div>
+    <div class="nav"><button class="back">← <span data-i18n="back"></span></button><span class="lang"><button data-lang="ua">UA</button><button data-lang="en">EN</button></span><span class="tag"><span data-i18n="module"></span> <b>02</b> / <span data-i18n="tagStack"></span></span></div>
     <div class="scroll">
-      <div class="head lime"><h2>СТЕК</h2><div class="sub" id="stack-sub"></div></div>
+      <div class="head lime"><h2 data-i18n="hStack"></h2><div class="sub" id="stack-sub"></div></div>
       <div class="body" id="stack-body"></div>
     </div>
   </section>
 
   <!-- ПРОЄКТИ -->
   <section class="screen" id="s-projects">
-    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>03</b> / ПРОЄКТИ</span></div>
+    <div class="nav"><button class="back">← <span data-i18n="back"></span></button><span class="lang"><button data-lang="ua">UA</button><button data-lang="en">EN</button></span><span class="tag"><span data-i18n="module"></span> <b>03</b> / <span data-i18n="tagProjects"></span></span></div>
     <div class="scroll">
-      <div class="head orange"><h2>ПРОЄКТИ</h2><div class="sub">торкніться сервісу, щоб розгорнути деталі</div></div>
+      <div class="head orange"><h2 data-i18n="hProjects"></h2><div class="sub" data-i18n="sProjects"></div></div>
       <div class="body" id="projects-body"></div>
     </div>
   </section>
 
   <!-- ДОСВІД -->
   <section class="screen" id="s-experience">
-    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>04</b> / ДОСВІД</span></div>
+    <div class="nav"><button class="back">← <span data-i18n="back"></span></button><span class="lang"><button data-lang="ua">UA</button><button data-lang="en">EN</button></span><span class="tag"><span data-i18n="module"></span> <b>04</b> / <span data-i18n="tagExp"></span></span></div>
     <div class="scroll">
-      <div class="head pink"><h2>ДОСВІД</h2><div class="sub">освіта · шлях</div></div>
+      <div class="head pink"><h2 data-i18n="hExp"></h2><div class="sub" data-i18n="sExp"></div></div>
       <div class="body" id="experience-body"></div>
     </div>
   </section>
 
   <!-- КОНТАКТ -->
   <section class="screen" id="s-contact">
-    <div class="nav"><button class="back">← НАЗАД</button><span class="tag">МОДУЛЬ <b>05</b> / КОНТАКТ</span></div>
+    <div class="nav"><button class="back">← <span data-i18n="back"></span></button><span class="lang"><button data-lang="ua">UA</button><button data-lang="en">EN</button></span><span class="tag"><span data-i18n="module"></span> <b>05</b> / <span data-i18n="tagContact"></span></span></div>
     <div class="scroll">
-      <div class="head violet"><h2>КОНТАКТ</h2><div class="sub">з'єднання зашифроване · відкритий до роботи</div></div>
+      <div class="head violet"><h2 data-i18n="hContact"></h2><div class="sub" data-i18n="sContact"></div></div>
       <div class="body" id="contact-body"></div>
     </div>
   </section>
@@ -354,116 +364,185 @@
 <aside class="desk-side">
   <div>
     <div class="desk-name">ДМИТРО<br>БАРИШПОЛЬ</div>
-    <div class="desk-role">AI Integrator · Python Developer · Odesa, UA</div>
+    <div class="desk-role" data-i18n="deskRole"></div>
   </div>
   <nav class="desk-nav">
-    <button class="desk-item" data-go="home"><span>00</span>Головна</button>
-    <button class="desk-item" data-go="profile"><span>01</span>Профіль</button>
-    <button class="desk-item" data-go="stack"><span>02</span>Стек</button>
-    <button class="desk-item" data-go="projects"><span>03</span>Проєкти</button>
-    <button class="desk-item" data-go="experience"><span>04</span>Досвід</button>
-    <button class="desk-item" data-go="contact"><span>05</span>Контакт</button>
+    <button class="desk-item" data-go="home"><span>00</span><span data-i18n="dHome"></span></button>
+    <button class="desk-item" data-go="profile"><span>01</span><span data-i18n="dProfile"></span></button>
+    <button class="desk-item" data-go="stack"><span>02</span><span data-i18n="dStack"></span></button>
+    <button class="desk-item" data-go="projects"><span>03</span><span data-i18n="dProjects"></span></button>
+    <button class="desk-item" data-go="experience"><span>04</span><span data-i18n="dExp"></span></button>
+    <button class="desk-item" data-go="contact"><span>05</span><span data-i18n="dContact"></span></button>
   </nav>
-  <a class="desk-cv" id="desk-cv" target="_blank" rel="noopener">↓ Завантажити CV (PDF)</a>
+  <a class="desk-cv" id="desk-cv" target="_blank" rel="noopener" data-i18n="deskCv"></a>
   <div class="desk-status"><i></i> open_to_work · online</div>
+  <div class="lang" style="margin-top:12px;align-self:center"><button data-lang="ua">UA</button><button data-lang="en">EN</button></div>
 </aside>
 
 <script>
 /* =====================================================================
    ⚙️  CONFIG — реальні дані з твого CV. Правити тут.
    ===================================================================== */
-const CONFIG = {
+/* =====================================================================
+   ⚙️  КОНТЕНТ ДВОМА МОВАМИ — правити тут.
+   UI  = підписи інтерфейсу | DATA = зміст резюме
+   ===================================================================== */
+const UI = {
+ ua:{ boot1:"стек", boot2:"сервіси", boot3:"статус", boot4:"готово",
+   bootSkip:"ТОРКНІТЬСЯ, ЩОБ ПРОПУСТИТИ",
+   kicker:"ПАНЕЛЬ КЕРУВАННЯ", kickerB:"AI-ІНТЕГРАТОР", choose:"оберіть модуль",
+   mProfile:"ПРОФІЛЬ", mStack:"СТЕК", mProjects:"ПРОЄКТИ", mExp:"ДОСВІД",
+   mContact:"КОНТАКТ", mContactSub:"НАПИСАТИ / НАЙНЯТИ",
+   back:"НАЗАД", module:"МОДУЛЬ",
+   tagProfile:"ПРОФІЛЬ", tagStack:"СТЕК", tagProjects:"ПРОЄКТИ", tagExp:"ДОСВІД", tagContact:"КОНТАКТ",
+   hProfile:"ПРОФІЛЬ", sProfile:"хто я і що роблю",
+   hStack:"СТЕК", hProjects:"ПРОЄКТИ", sProjects:"торкніться сервісу, щоб розгорнути деталі",
+   hExp:"ДОСВІД", sExp:"освіта · шлях",
+   hContact:"КОНТАКТ", sContact:"з'єднання зашифроване · відкритий до роботи",
+   deskRole:"AI Integrator · Python Developer · Одеса, Україна",
+   dHome:"Головна", dProfile:"Профіль", dStack:"Стек", dProjects:"Проєкти",
+   dExp:"Досвід", dContact:"Контакт", deskCv:"↓ Завантажити CV (PDF)",
+   stackSub:"технологій · оновлено 2026" },
+ en:{ boot1:"stack", boot2:"services", boot3:"status", boot4:"ready",
+   bootSkip:"TAP TO SKIP",
+   kicker:"CONTROL PANEL", kickerB:"AI INTEGRATOR", choose:"select module",
+   mProfile:"PROFILE", mStack:"STACK", mProjects:"PROJECTS", mExp:"EXPERIENCE",
+   mContact:"CONTACT", mContactSub:"MESSAGE / HIRE",
+   back:"BACK", module:"MODULE",
+   tagProfile:"PROFILE", tagStack:"STACK", tagProjects:"PROJECTS", tagExp:"EXPERIENCE", tagContact:"CONTACT",
+   hProfile:"PROFILE", sProfile:"who I am and what I do",
+   hStack:"STACK", hProjects:"PROJECTS", sProjects:"tap a service to expand details",
+   hExp:"EXPERIENCE", sExp:"education · path",
+   hContact:"CONTACT", sContact:"connection encrypted · open to work",
+   deskRole:"AI Integrator · Python Developer · Odesa, Ukraine",
+   dHome:"Home", dProfile:"Profile", dStack:"Stack", dProjects:"Projects",
+   dExp:"Experience", dContact:"Contact", deskCv:"↓ Download CV (PDF)",
+   stackSub:"technologies · updated 2026" }
+};
+
+const CONTACTS = [
+  {rk:"TELEGRAM", rv:"@reven_vest", href:"https://t.me/reven_vest", cta:true},
+  {rk:"EMAIL", rv:"dmitrybaryshpol@gmail.com", href:"mailto:dmitrybaryshpol@gmail.com"},
+  {rk:{ua:"ТЕЛЕФОН",en:"PHONE"}, rv:"+380 50 643 4808", href:"tel:+380506434808"},
+  {rk:"GITHUB", rv:"github.com/dmitrybaryshpol-hub", href:"https://github.com/dmitrybaryshpol-hub"},
+  {rk:"LINKEDIN", rv:"dmitry-barry", href:"https://www.linkedin.com/in/dmitry-barry-478544135/"},
+  {rk:"CV / PDF", rv:{ua:"Завантажити резюме",en:"Download resume"},
+   href:"https://docs.google.com/document/d/10WUGf3HOWsP3Z5m5maMKQLwOS_jhm774m2QfpdK9kvQ/export?format=pdf"}
+];
+
+const DATA = {
+ ua:{
   name1:"ДМИТРО", name2:"БАРИШПОЛЬ",
   role:"AI Integrator · Python Developer · Automation",
   location:"Одеса, Україна · <span class='g'>відкритий до офіційного працевлаштування</span> · можливе бронювання · англійська B1",
-  chips:[
-    {t:"OPEN TO WORK", hot:true},
-    {t:"python"},{t:"aiogram 3.x"},{t:"supabase"},{t:"LLM API"},{t:"mini apps"}
-  ],
-
+  chips:[{t:"OPEN TO WORK",hot:true},{t:"python"},{t:"aiogram 3.x"},{t:"supabase"},{t:"LLM API"},{t:"mini apps"}],
   profile:[
-    "Проєктую й підтримую чат-боти для Telegram (aiogram 3.x) та інтегрую LLM API (Claude, GPT) у робочі процеси.",
-    "Маю досвід повного циклу: від бекенду на Supabase (PostgreSQL, Edge Functions) до деплою в продакшн і документування.",
-    "Вивів productized-бота на щомісячну підписку. Впевнено працюю з SQL, даними та Git.",
-    "Швидко освоюю нові інструменти (no-code / low-code, CRM). Шукаю Junior-позицію: Python / AI-автоматизація."
-  ],
-
+   "Проєктую й підтримую чат-боти для Telegram (aiogram 3.x) та інтегрую LLM API (Claude, GPT) у робочі процеси.",
+   "Маю досвід повного циклу: від бекенду на Supabase (PostgreSQL, Edge Functions) до деплою в продакшн і документування.",
+   "Вивів productized-бота на щомісячну підписку. Впевнено працюю з SQL, даними та Git.",
+   "Швидко освоюю нові інструменти (no-code / low-code, CRM). Шукаю Junior-позицію: Python / AI-автоматизація."],
   stack:[
-    {group:"AI / LLM", key:true, items:["Інтеграція LLM API (Claude, GPT)","Prompt engineering","AI-агенти (основи)","Claude Code"]},
-    {group:"Боти та Telegram", items:["Telegram Bot API","aiogram 3.x","Telegram Mini Apps","Стани · рольовий доступ"]},
-    {group:"Бекенд і БД", items:["Supabase","PostgreSQL","Edge Functions","Auth · Storage","aiosqlite","REST API"]},
-    {group:"Автоматизація", items:["Serverless","APScheduler","webhooks","n8n · Make · Zapier"]},
-    {group:"Дані та аналітика", items:["SQL (PostgreSQL)","Дашборди","Наскрізна аналітика"]},
-    {group:"Мови", items:["Python","SQL","JavaScript (базово)"]},
-    {group:"Інструменти", items:["Git / GitHub","Railway","Docker (основи)"]}
-  ],
-
-  // status: live | sub | dev ; stLabel — текст пігулки
+   {group:"AI / LLM", key:true, items:["Інтеграція LLM API (Claude, GPT)","Prompt engineering","AI-агенти (основи)","Claude Code"]},
+   {group:"Боти та Telegram", items:["Telegram Bot API","aiogram 3.x","Telegram Mini Apps","Стани · рольовий доступ"]},
+   {group:"Бекенд і БД", items:["Supabase","PostgreSQL","Edge Functions","Auth · Storage","aiosqlite","REST API"]},
+   {group:"Автоматизація", items:["Serverless","APScheduler","webhooks","n8n · Make · Zapier"]},
+   {group:"Дані та аналітика", items:["SQL (PostgreSQL)","Дашборди","Наскрізна аналітика"]},
+   {group:"Мови", items:["Python","SQL","JavaScript (базово)"]},
+   {group:"Інструменти", items:["Git / GitHub","Railway","Docker (основи)"]}],
   projects:[
-    { name:"DETAIL MIND", status:"live", stLabel:"LIVE · v1.2",
-      desc:"Telegram Mini App для студій детейлінгу (раніше Wrap 1654 Manager): замовлення, клієнти, календар, склад. Попередня версія — у продакшні; ребренд у розробці.",
-      bullets:[
-        "Працює в продакшні (v1.2): управління замовленнями, клієнтами, календарем і складом.",
-        "Edge Function smart-handler: валідація Telegram initData, авторизація, вставки у Supabase Storage.",
-        "Прибрав експозицію service role з фронтенду — чутлива логіка на захищеному бекенді.",
-        "Dashboard PRO — аналітика для власника студії.",
-        "У розробці — ребренд DetailMind: новий дизайн, вбудований support chat, лояльність (бейджі/бали для студій і майстрів)."
-      ],
-      tech:"Supabase (PostgreSQL · Edge Functions · Auth · Storage) · Telegram Mini Apps · JS" },
-
-    { name:"CAFE BOT", status:"sub", stLabel:"ПІДПИСКА · В ПРОДАКШНІ",
-      desc:"Productized-бот для мережі кав'ярень за моделлю щомісячної підписки.",
-      bullets:[
-        "Картки замовлень і статусні переходи з рольовим доступом (staff-only за Telegram ID).",
-        "Програма лояльності (кожна 8-ма кава безкоштовно) з детекцією ключових слів.",
-        "Автоматизація робочих годин і щотижнева статистика власнику (APScheduler, коректні таймзони)."
-      ],
-      tech:"Python 3.11 · aiogram 3.x · aiosqlite · APScheduler · Railway" },
-
-    { name:"RRP GUARD", status:"dev", stLabel:"2026 · В РОЗРОБЦІ",
-      desc:"Бот моніторингу дотримання РРЦ для дистриб'ютора.",
-      bullets:[
-        "Автоматичний моніторинг порушень цін: ~100 SKU, 5–10 майданчиків.",
-        "Щоденний зведений звіт о 10:00 у Telegram; збір і обробка даних у Supabase (SQL)."
-      ],
-      tech:"Python 3.11 · aiogram 3.x · Supabase · звіти за розкладом" },
-
-    { name:"SALES TRACKER", status:"live", stLabel:"ВНУТРІШНІЙ · LIVE",
-      desc:"Персональний бот-трекер воронки продажів на serverless-архітектурі.",
-      bullets:[
-        "Метрики воронки в реальному часі, зберігання й обробка в Supabase.",
-        "Serverless-логіка на Edge Functions без окремого сервера."
-      ],
-      tech:"Supabase Edge Functions · PostgreSQL" }
-  ],
-
+   {name:"DETAIL MIND", status:"live", stLabel:"LIVE · v1.2",
+    desc:"Telegram Mini App для студій детейлінгу (раніше Wrap 1654 Manager): замовлення, клієнти, календар, склад. Попередня версія — у продакшні; ребренд у розробці.",
+    bullets:["Працює в продакшні (v1.2): управління замовленнями, клієнтами, календарем і складом.",
+     "Edge Function smart-handler: валідація Telegram initData, авторизація, вставки у Supabase Storage.",
+     "Прибрав експозицію service role з фронтенду — чутлива логіка на захищеному бекенді.",
+     "Dashboard PRO — аналітика для власника студії.",
+     "У розробці — ребренд DetailMind: новий дизайн, вбудований support chat, лояльність (бейджі/бали)."],
+    tech:"Supabase (PostgreSQL · Edge Functions · Auth · Storage) · Telegram Mini Apps · JS"},
+   {name:"CAFE BOT", status:"sub", stLabel:"ПІДПИСКА · В ПРОДАКШНІ",
+    desc:"Productized-бот для мережі кав'ярень за моделлю щомісячної підписки.",
+    bullets:["Картки замовлень і статусні переходи з рольовим доступом (staff-only за Telegram ID).",
+     "Програма лояльності (кожна 8-ма кава безкоштовно) з детекцією ключових слів.",
+     "Автоматизація робочих годин і щотижнева статистика власнику (APScheduler, коректні таймзони)."],
+    tech:"Python 3.11 · aiogram 3.x · aiosqlite · APScheduler · Railway"},
+   {name:"RRP GUARD", status:"dev", stLabel:"2026 · В РОЗРОБЦІ",
+    desc:"Бот моніторингу дотримання РРЦ для дистриб'ютора.",
+    bullets:["Автоматичний моніторинг порушень цін: ~100 SKU, 5–10 майданчиків.",
+     "Щоденний зведений звіт о 10:00 у Telegram; збір і обробка даних у Supabase (SQL)."],
+    tech:"Python 3.11 · aiogram 3.x · Supabase · звіти за розкладом"},
+   {name:"SALES TRACKER", status:"live", stLabel:"ВНУТРІШНІЙ · LIVE",
+    desc:"Персональний бот-трекер воронки продажів на serverless-архітектурі.",
+    bullets:["Метрики воронки в реальному часі, зберігання й обробка в Supabase.",
+     "Serverless-логіка на Edge Functions без окремого сервера."],
+    tech:"Supabase Edge Functions · PostgreSQL"}],
   experience:[
-    { yr:"2022 — 2026", ti:"Співзасновник", co:"студія Wrap 1654 (тепер Detail Mind), Одеса",
-      bullets:[
-        "Організація та автоматизація внутрішніх бізнес-процесів; розробка власних цифрових інструментів.",
-        "Ведення клієнтів від першого звернення до завершення проєкту; впровадження CRM-підходу."
-      ]},
-    { yr:"2018 — 2022", ti:"Майстер з поклейки автоплівок", co:"Одеса",
-      bullets:[
-        "Технічне виконання робіт, контроль якості, планування виробничих процесів.",
-        "Робота з клієнтами в умовах жорстких дедлайнів."
-      ]},
-    { yr:"2014 — 2019", ti:"Бакалавр з телекомунікацій", co:"ХНУРЕ, Харків",
-      bullets:["Академічний сертифікат з кібербезпеки (спеціальність 125)."]}
-  ],
-
-  // Контакти — з CV. CV(PDF) відкриється, лише якщо Google-документ у доступі "всім за посиланням".
-  contact:[
-    {rk:"TELEGRAM", rv:"@reven_vest", href:"https://t.me/reven_vest", cta:true},
-    {rk:"EMAIL", rv:"dmitrybaryshpol@gmail.com", href:"mailto:dmitrybaryshpol@gmail.com"},
-    {rk:"ТЕЛЕФОН", rv:"+380 50 643 4808", href:"tel:+380506434808"},
-    {rk:"GITHUB", rv:"github.com/dmitrybaryshpol-hub", href:"https://github.com/dmitrybaryshpol-hub"},
-    {rk:"LINKEDIN", rv:"dmitry-barry", href:"https://www.linkedin.com/in/dmitry-barry-478544135/"},
-    {rk:"CV / PDF", rv:"Завантажити резюме", href:"https://docs.google.com/document/d/10WUGf3HOWsP3Z5m5maMKQLwOS_jhm774m2QfpdK9kvQ/export?format=pdf"}
-  ],
-
+   {yr:"2022 — 2026", ti:"Співзасновник", co:"студія Wrap 1654 (тепер Detail Mind), Одеса",
+    bullets:["Організація та автоматизація внутрішніх бізнес-процесів; розробка власних цифрових інструментів.",
+     "Ведення клієнтів від першого звернення до завершення проєкту; впровадження CRM-підходу."]},
+   {yr:"2018 — 2022", ti:"Майстер з поклейки автоплівок", co:"Одеса",
+    bullets:["Технічне виконання робіт, контроль якості, планування виробничих процесів.",
+     "Робота з клієнтами в умовах жорстких дедлайнів."]},
+   {yr:"2014 — 2019", ti:"Бакалавр з телекомунікацій", co:"ХНУРЕ, Харків",
+    bullets:["Академічний сертифікат з кібербезпеки (спеціальність 125)."]}],
   scheduler:"SCHED · rrp_guard → звіт 10:00 <b>✓</b> · cafe_bot → лояльність <b>online</b> · detail_mind → build <i>у розробці</i> · sales_tracker → uptime <b>ok</b> · "
+ },
+ en:{
+  name1:"DMYTRO", name2:"BARYSHPOL",
+  role:"AI Integrator · Python Developer · Automation",
+  location:"Odesa, Ukraine · <span class='g'>open to full-time employment</span> · relocation-ready · English B1",
+  chips:[{t:"OPEN TO WORK",hot:true},{t:"python"},{t:"aiogram 3.x"},{t:"supabase"},{t:"LLM API"},{t:"mini apps"}],
+  profile:[
+   "I design and maintain Telegram chatbots (aiogram 3.x) and integrate LLM APIs (Claude, GPT) into business workflows.",
+   "Full-cycle experience: from a Supabase backend (PostgreSQL, Edge Functions) to production deployment and documentation.",
+   "Shipped a productized bot on a monthly subscription model. Confident with SQL, data and Git.",
+   "Fast learner with new tools (no-code / low-code, CRM). Looking for a Junior role: Python / AI automation."],
+  stack:[
+   {group:"AI / LLM", key:true, items:["LLM API integration (Claude, GPT)","Prompt engineering","AI agents (basics)","Claude Code"]},
+   {group:"Bots & Telegram", items:["Telegram Bot API","aiogram 3.x","Telegram Mini Apps","States · role-based access"]},
+   {group:"Backend & DB", items:["Supabase","PostgreSQL","Edge Functions","Auth · Storage","aiosqlite","REST API"]},
+   {group:"Automation", items:["Serverless","APScheduler","webhooks","n8n · Make · Zapier"]},
+   {group:"Data & analytics", items:["SQL (PostgreSQL)","Dashboards","End-to-end analytics"]},
+   {group:"Languages", items:["Python","SQL","JavaScript (basic)"]},
+   {group:"Tools", items:["Git / GitHub","Railway","Docker (basics)"]}],
+  projects:[
+   {name:"DETAIL MIND", status:"live", stLabel:"LIVE · v1.2",
+    desc:"Telegram Mini App for car detailing studios (formerly Wrap 1654 Manager): orders, clients, calendar, inventory. Previous version is live in production; rebrand in progress.",
+    bullets:["Running in production (v1.2): orders, clients, calendar and inventory management.",
+     "Edge Function smart-handler: Telegram initData validation, authorization, Supabase Storage uploads.",
+     "Removed service-role exposure from the frontend — sensitive logic moved to a secured backend.",
+     "Dashboard PRO — analytics for the studio owner.",
+     "In development — DetailMind rebrand: new design, built-in support chat, loyalty (badges/points)."],
+    tech:"Supabase (PostgreSQL · Edge Functions · Auth · Storage) · Telegram Mini Apps · JS"},
+   {name:"CAFE BOT", status:"sub", stLabel:"SUBSCRIPTION · IN PRODUCTION",
+    desc:"Productized bot for a coffee shop chain on a monthly subscription model.",
+    bullets:["Order cards and status transitions with role-based access (staff-only by Telegram ID).",
+     "Loyalty program (every 8th coffee free) with keyword detection.",
+     "Working-hours automation and weekly stats for the owner (APScheduler, correct timezones)."],
+    tech:"Python 3.11 · aiogram 3.x · aiosqlite · APScheduler · Railway"},
+   {name:"RRP GUARD", status:"dev", stLabel:"2026 · IN DEVELOPMENT",
+    desc:"MSRP compliance monitoring bot for a distributor.",
+    bullets:["Automated price-violation monitoring: ~100 SKUs, 5–10 marketplaces.",
+     "Daily summary report at 10:00 in Telegram; data collection and processing in Supabase (SQL)."],
+    tech:"Python 3.11 · aiogram 3.x · Supabase · scheduled reports"},
+   {name:"SALES TRACKER", status:"live", stLabel:"INTERNAL · LIVE",
+    desc:"Personal sales-funnel tracker bot on a serverless architecture.",
+    bullets:["Real-time funnel metrics, stored and processed in Supabase.",
+     "Serverless logic on Edge Functions with no dedicated server."],
+    tech:"Supabase Edge Functions · PostgreSQL"}],
+  experience:[
+   {yr:"2022 — 2026", ti:"Co-founder", co:"Wrap 1654 studio (now Detail Mind), Odesa",
+    bullets:["Organized and automated internal business processes; built in-house digital tools.",
+     "Managed clients from first contact to project completion; introduced a CRM approach."]},
+   {yr:"2018 — 2022", ti:"Car wrapping specialist", co:"Odesa",
+    bullets:["Hands-on execution, quality control and production planning.",
+     "Client work under tight deadlines."]},
+   {yr:"2014 — 2019", ti:"BSc in Telecommunications", co:"KhNURE, Kharkiv",
+    bullets:["Academic certificate in cybersecurity (specialty 125)."]}],
+  scheduler:"SCHED · rrp_guard → report 10:00 <b>✓</b> · cafe_bot → loyalty <b>online</b> · detail_mind → build <i>in progress</i> · sales_tracker → uptime <b>ok</b> · "
+ }
 };
+
+let LANG = 'ua';
+let CONFIG = DATA[LANG];
 
 /* =====================================================================
    Логіка
@@ -520,18 +599,39 @@ document.addEventListener('click',e=>{
   const s=e.target.closest('.svc .top'); if(s){ s.parentElement.classList.toggle('open'); }
 });
 
+/* ── i18n: підписи інтерфейсу ── */
+function applyUI(){
+  const t = UI[LANG];
+  document.querySelectorAll('[data-i18n]').forEach(n=>{
+    const v = t[n.dataset.i18n]; if(v!=null) n.textContent = v;
+  });
+  document.querySelectorAll('.lang button').forEach(b=>
+    b.classList.toggle('on', b.dataset.lang===LANG));
+  document.documentElement.lang = (LANG==='ua'?'uk':'en');
+}
+
 /* РЕНДЕР */
 function render(){
+  CONFIG = DATA[LANG];
+  const t = UI[LANG];
+  applyUI();
+
   $('#h-n1').textContent=CONFIG.name1;
   $('#h-n2').textContent=CONFIG.name2;
   $('#h-role').innerHTML=CONFIG.role.replace(/·/g,'<span class="d">·</span>');
   $('#h-loc').innerHTML=CONFIG.location;
+
+  // очищаємо контейнери — щоб перемикання мови не дублювало вміст
+  ['#h-chips','#profile-body','#stack-body','#projects-body','#experience-body','#contact-body']
+    .forEach(s=>{ const n=$(s); if(n) n.innerHTML=''; });
+
   CONFIG.chips.forEach(c=>$('#h-chips').appendChild(el('span','chip'+(c.hot?' hot':''),c.t)));
   $('#tick').innerHTML=CONFIG.scheduler.repeat(2);
 
   // profile
   const pb=$('#profile-body');
-  CONFIG.profile.forEach(p=>{const d=el('p',null,p);d.style.cssText='font-size:13.5px;color:#cdcdd8;line-height:1.65;margin-bottom:14px';pb.appendChild(d);});
+  CONFIG.profile.forEach(p=>{const d=el('p',null,p);
+    d.style.cssText='font-size:13.5px;color:#cdcdd8;line-height:1.65;margin-bottom:14px';pb.appendChild(d);});
 
   // stack
   let n=0;
@@ -541,20 +641,19 @@ function render(){
     g.items.forEach(i=>{tags.appendChild(el('span','tg'+(g.key?' k':''),i));n++;});
     grp.appendChild(tags); $('#stack-body').appendChild(grp);
   });
-  $('#stack-sub').textContent=n+' технологій · оновлено 2026';
+  $('#stack-sub').textContent=n+' '+t.stackSub;
 
   // projects
   CONFIG.projects.forEach(p=>{
     const li=p.bullets.map(b=>`<li>${b}</li>`).join('');
-    const card=el('div','svc',
+    $('#projects-body').appendChild(el('div','svc',
       `<div class="top">
          <span class="dot ${p.status}"></span>
          <div class="mid"><div class="sn">${p.name}</div><div class="sd">${p.desc}</div></div>
          <span class="stt ${p.status}">${p.stLabel}</span>
          <span class="chev">▸</span>
        </div>
-       <div class="exp"><div class="expi"><ul>${li}</ul><div class="tech">↳ ${p.tech}</div></div></div>`);
-    $('#projects-body').appendChild(card);
+       <div class="exp"><div class="expi"><ul>${li}</ul><div class="tech">↳ ${p.tech}</div></div></div>`));
   });
 
   // experience
@@ -564,10 +663,11 @@ function render(){
       `<div class="yr">${x.yr}</div><div class="ti">${x.ti}</div><div class="co">${x.co}</div><ul>${li}</ul>`));
   });
 
-  // contact
-  CONFIG.contact.forEach(c=>{
+  // contact — підписи можуть бути рядком або {ua,en}
+  const L = v => (typeof v==='object' && v!==null) ? (v[LANG]||v.ua) : v;
+  CONTACTS.forEach(c=>{
     const row=el('a','row'+(c.cta?' cta':''),
-      `<div class="rk">${c.rk}</div><div class="rv">${c.rv}</div><div class="ra">↗</div>`);
+      `<div class="rk">${L(c.rk)}</div><div class="rv">${L(c.rv)}</div><div class="ra">↗</div>`);
     row.href=c.href;
     if(!/^(mailto|tel):/.test(c.href)){row.target='_blank';row.rel='noopener';}
     $('#contact-body').appendChild(row);
@@ -575,10 +675,54 @@ function render(){
   $('#contact-body').appendChild(el('div','foot',
     'ROOT/SYS/CONTACT_INDEX<br>CONNECTION: <span class="g">ENCRYPTED</span><br>STATUS: <span class="g">OPEN_TO_WORK</span> · LAST_SYNC 0.042s'));
 
-  // desktop-сайдбар: беремо той самий лінк CV, що й у мобільному контакті
-  const cvEntry = CONFIG.contact.find(c => c.rk === 'CV / PDF');
-  if (cvEntry) $('#desk-cv').href = cvEntry.href;
+  const cv = CONTACTS.find(c=>c.rk==='CV / PDF');
+  if(cv) $('#desk-cv').href = cv.href;
+
+  fitName();
 }
+
+/* ── прізвище на всю ширину екрана ──
+   На відміну від "не вилазити за край", тут ціль — точно заповнити
+   доступну ширину: масштабуємо кегль і вгору, і вниз. Ім'я лишається
+   пропорційно меншим (класична афішна ієрархія: маленьке зверху, велике знизу). */
+function fitOne(sel, avail, mode){
+  const n = $(sel); if(!n || avail<=0) return;
+  n.style.fontSize = '';
+  const probe = 200;                       // еталонний кегль для виміру
+  n.style.fontSize = probe+'px';
+  const w = n.scrollWidth;
+  n.style.fontSize = '';
+  if(w<=0) return;
+  let target = avail / w * probe;
+  if(mode==='shrink'){
+    const base = parseFloat(getComputedStyle(n).fontSize);
+    target = Math.min(base, target);        // не збільшуємо понад базовий CSS-кегль
+  }
+  target = Math.max(target, 16);
+  n.style.fontSize = target + 'px';
+}
+function fitName(){
+  const n1 = $('#h-n1'); if(!n1) return;
+  const p = n1.parentElement, ps = getComputedStyle(p);
+  const avail = p.clientWidth
+              - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight)
+              - 4;
+  fitOne('#h-n1', avail, 'shrink');   // ім'я: не вилазить за край
+  fitOne('#h-n2', avail, 'fill');     // прізвище: рівно на всю ширину
+}
+window.addEventListener('resize', fitName);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitName);
+
+/* перемикання мови */
+function setLang(l){
+  if(l===LANG || !UI[l]) return;
+  LANG=l; render();
+  if(tg&&tg.HapticFeedback) tg.HapticFeedback.selectionChanged&&tg.HapticFeedback.selectionChanged();
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.lang button'); if(b){ e.stopPropagation(); setLang(b.dataset.lang); }
+});
+
 render();
 
 /* годинник */
